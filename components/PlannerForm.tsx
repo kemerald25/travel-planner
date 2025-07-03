@@ -7,12 +7,13 @@ import CryptoSearchDropdown from './CryptoSearchDropdown';
 import type { Coin } from '../types';
 
 interface PlannerFormProps {
-  onSubmit: (destination: string, budget: string, interests: string[]) => void;
+  onSubmit: (destination: string, budget: string, interests: string[], duration: string) => void;
   isLoading: boolean;
 }
 
 const PlannerForm: React.FC<PlannerFormProps> = ({ onSubmit, isLoading }) => {
   const [destination, setDestination] = useState<string>('');
+  const [duration, setDuration] = useState<string>('');
   const [selectedInterests, setSelectedInterests] = useState<Set<string>>(new Set());
 
   // Updated state for complex budget input
@@ -44,6 +45,10 @@ const PlannerForm: React.FC<PlannerFormProps> = ({ onSubmit, isLoading }) => {
       setFormError("Please fill out the destination.");
       return;
     }
+    if (!duration.trim()) {
+      setFormError("Please fill out the duration.");
+      return;
+    }
 
     if (!budgetAmount.trim()) {
       setFormError("Please enter a budget amount.");
@@ -60,7 +65,7 @@ const PlannerForm: React.FC<PlannerFormProps> = ({ onSubmit, isLoading }) => {
 
     if (budgetType === 'fiat') {
       budgetString = `${amount} ${fiatCurrency}`;
-      onSubmit(destination, budgetString, Array.from(selectedInterests));
+      onSubmit(destination, budgetString, Array.from(selectedInterests), duration);
     } else { // Crypto
       if (!selectedCoin) {
         setFormError("Please select a cryptocurrency.");
@@ -70,7 +75,7 @@ const PlannerForm: React.FC<PlannerFormProps> = ({ onSubmit, isLoading }) => {
       try {
         const usdValue = await getCryptoValueInUSD(selectedCoin.id, amount);
         budgetString = `approx. $${usdValue.toLocaleString('en-US', { maximumFractionDigits: 0 })} USD (from ${amount} ${selectedCoin.name})`;
-        onSubmit(destination, budgetString, Array.from(selectedInterests));
+        onSubmit(destination, budgetString, Array.from(selectedInterests), duration);
       } catch (err) {
         if (err instanceof Error) {
             setFormError(err.message);
@@ -88,6 +93,7 @@ const PlannerForm: React.FC<PlannerFormProps> = ({ onSubmit, isLoading }) => {
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-slate-700 h-full">
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div className='grid grid-cols-2 gap-3'>
         <div>
           <label htmlFor="destination" className="block text-sm font-medium text-slate-300 mb-2">
             Destination
@@ -101,6 +107,21 @@ const PlannerForm: React.FC<PlannerFormProps> = ({ onSubmit, isLoading }) => {
             className="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300"
             required
           />
+        </div>
+        <div>
+          <label htmlFor="destination" className="block text-sm font-medium text-slate-300 mb-2">
+            Duration
+          </label>
+          <input
+            type="number"
+            id="duration"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            placeholder="e.g., 3"
+            className="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300"
+            required
+          />
+        </div>
         </div>
 
         {/* --- Updated Budget Section --- */}

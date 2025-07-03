@@ -8,7 +8,7 @@ if (!process.env.API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const buildPrompt = (destination: string, budget: string, interests: string[]): string => {
+const buildPrompt = (destination: string, budget: string, interests: string[], duration: string): string => {
   const interestsString = interests.length > 0 ? `The traveler's main interests are: ${interests.join(", ")}.` : "The traveler is open to all kinds of activities.";
 
   return `
@@ -17,7 +17,7 @@ const buildPrompt = (destination: string, budget: string, interests: string[]): 
     **Constraints & Preferences:**
     - **Budget:** The approximate budget for the trip is ${budget}. Please suggest a mix of activities and dining options (from budget-friendly to moderate) that align with this.
     - **Interests:** ${interestsString} Prioritize suggestions that match these interests.
-    - **Duration:** Please create a 3-day itinerary.
+    - **Duration:** Please create a ${duration}-day itinerary.
     - **Real-time Data:** Use Google Search to find up-to-date information for suggestions like opening hours, ticket prices, and local recommendations. Ensure the suggestions are current and relevant.
 
     **Output Format:**
@@ -33,9 +33,10 @@ const buildPrompt = (destination: string, budget: string, interests: string[]): 
 export const generateItinerary = async (
   destination: string,
   budget: string,
-  interests: string[]
+  interests: string[],
+  duration: string
 ): Promise<{ itinerary: string; sources: ItinerarySource[] }> => {
-  const prompt = buildPrompt(destination, budget, interests);
+  const prompt = buildPrompt(destination, budget, interests, duration);
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({

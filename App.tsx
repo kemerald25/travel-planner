@@ -11,14 +11,14 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePlanRequest = useCallback(async (destination: string, budget: string, interests: string[]) => {
+  const handlePlanRequest = useCallback(async (destination: string, budget: string, interests: string[], duration: string) => {
     setIsLoading(true);
     setError(null);
     setItinerary('');
     setSources([]);
 
     try {
-      const result = await generateItinerary(destination, budget, interests);
+      const result = await generateItinerary(destination, budget, interests, duration,);
       setItinerary(result.itinerary);
       setSources(result.sources);
     } catch (err) {
