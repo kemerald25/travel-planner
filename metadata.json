@@ -1,0 +1,5 @@
+{
+  "name": "Smart Travel Planner",
+  "description": "An intelligent trip-planning application that generates personalized travel itineraries based on your destination, budget, and interests, leveraging real-time information to provide up-to-date suggestions.",
+  "requestFramePermissions": []
+}
